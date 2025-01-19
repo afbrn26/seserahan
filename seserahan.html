@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Seserahan</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f3e9; /* Latar belakang cream */
+            color: #5c5c3d;
+            margin: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #8b7d6b;
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #8b7d6b;
+            text-align: center;
+            margin: 20px 0;
+            text-transform: uppercase;
+            font-size: 1.2em;
+        }
+        table {
+            width: 100%; /* Full width untuk layar kecil */
+            margin: 0 auto 20px;
+            border-collapse: collapse;
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            border: 1px solid #e6dfcf;
+            padding: 10px;
+            text-align: center;
+            font-size: 14px; /* Ukuran font lebih kecil untuk layar kecil */
+        }
+        th {
+            background-color: #f0e6d2;
+        }
+        td a {
+            color: #8b7d6b;
+            text-decoration: none;
+            font-size: 13px; /* Ukuran font link lebih kecil */
+        }
+        td a:hover {
+            text-decoration: underline;
+        }
+        .checked {
+            text-decoration: line-through;
+            color: #a6a39e;
+        }
+        .checkbox input {
+            transform: scale(1.2);
+            cursor: pointer;
+        }
+        @media (max-width: 600px) {
+            th, td {
+                font-size: 12px; /* Ukuran font lebih kecil untuk layar kecil */
+                padding: 8px;
+            }
+            h1, h2 {
+                font-size: 18px; /* Ukuran heading lebih kecil */
+            }
+            table {
+                width: 100%; /* Lebar penuh untuk layar kecil */
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Daftar Seserahan Destya</h1>
+    <div id="kelompok-seserahan">
+        <!-- Kelompok data akan diisi dengan JavaScript -->
+    </div>
+
+    <script>
+        const seserahan = [
+            {
+                kelompok: "Alat Salat",
+                items: [
+                    { jenis: "Mukena", harga: "Rp152.510,00", lokasi: "https://shope.ee/8KK5zTkqby" },
+                    { jenis: "Sajadah", harga: "Rp158.543,00", lokasi: "https://shope.ee/8UbxFjD0gF" },
+                    { jenis: "Al Qur’an", harga: "Rp208.500,00", lokasi: "https://shope.ee/5UudVTobom" },
+                    { jenis: "Tasbih", harga: "Rp85.794,00", lokasi: "https://shope.ee/1AleLh0SKh" }
+                ]
+            },
+            {
+                kelompok: "Toiletries",
+                items: [
+                    { jenis: "Sabun", harga: "Rp67.521,00", lokasi: "https://shope.ee/10Y9ZUqPMi" },
+                    { jenis: "Shampoo", harga: "Rp105.198,00", lokasi: "https://shope.ee/4AUgJFK8pN" },
+                    { jenis: "Conditioner", harga: "Rp105.198,00", lokasi: "https://shope.ee/4AUgJFK8pN" },
+                    { jenis: "Handuk Couple", harga: "Rp235.501,00", lokasi: "https://shope.ee/6UqssDguiw" },
+                    { jenis: "Sikat gigi (2pcs)", harga: "Rp47.391,00", lokasi: "https://shope.ee/6UqssVZdv0" },
+                    { jenis: "Pasta gigi", harga: "Rp35.900,00", lokasi: "https://shope.ee/7f4P6KYmAg" },
+                    { jenis: "Scrub/Lulur", harga: "Rp66.000,00", lokasi: "https://shope.ee/9KDHV415ea" },
+                    { jenis: "ShowerPuff (couple)", harga: "Rp19.900", lokasi: "https://shope.ee/9pEdiiPMhA" }
+                ]
+            }
+        ];
+
+        function loadChecklistStatus() {
+            const savedStatus = localStorage.getItem('seserahanChecklist');
+            return savedStatus ? JSON.parse(savedStatus) : {};
+        }
+
+        function saveChecklistStatus(status) {
+            localStorage.setItem('seserahanChecklist', JSON.stringify(status));
+        }
+
+        const checklistStatus = loadChecklistStatus();
+
+        const container = document.getElementById('kelompok-seserahan');
+
+        function renderSeserahan() {
+            container.innerHTML = '';
+            seserahan.forEach((kelompok, kelompokIndex) => {
+                const heading = document.createElement('h2');
+                heading.textContent = kelompok.kelompok;
+                container.appendChild(heading);
+
+                const table = document.createElement('table');
+                const thead = `
+                    <thead>
+                        <tr>
+                            <th>JENIS BARANG</th>
+                            <th>HARGA BELI</th>
+                            <th>LOKASI BELI</th>
+                            <th>CHECKLIST</th>
+                        </tr>
+                    </thead>
+                `;
+                table.innerHTML = thead;
+                const tbody = document.createElement('tbody');
+
+                kelompok.items.forEach((item, itemIndex) => {
+                    const itemId = `${kelompokIndex}-${itemIndex}`;
+                    const isChecked = checklistStatus[itemId] || false;
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="${isChecked ? 'checked' : ''}">${item.jenis}</td>
+                        <td>${item.harga}</td>
+                        <td><a href="${item.lokasi}" target="_blank">Beli di sini</a></td>
+                        <td class="checkbox">
+                            <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleChecklist('${itemId}')">
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+
+                table.appendChild(tbody);
+                container.appendChild(table);
+            });
+        }
+
+        function toggleChecklist(itemId) {
+            checklistStatus[itemId] = !checklistStatus[itemId];
+            saveChecklistStatus(checklistStatus);
+            renderSeserahan();
+        }
+
+        renderSeserahan();
+    </script>
+</body>
+</html>
