@@ -57,6 +57,12 @@
             transform: scale(1.2);
             cursor: pointer;
         }
+        .total-harga {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
         @media (max-width: 600px) {
             th, td {
                 font-size: 12px; /* Ukuran font lebih kecil untuk layar kecil */
@@ -76,26 +82,27 @@
     <div id="kelompok-seserahan">
         <!-- Kelompok data akan diisi dengan JavaScript -->
     </div>
+    <div class="total-harga">Total Harga: <span id="total-harga">Rp 0</span></div>
 
     <script>
         const seserahan = [
             {
                 kelompok: "Dailywear",
                 items: [
-                    { jenis: "Abaya", harga: "Rp 399.000,00", lokasi: "https://id.shp.ee/8uj4pp6" },
-                    { jenis: "Khimar", harga: "Rp 198.550,00", lokasi: "https://id.shp.ee/BGVU1W8" }
+                    { jenis: "Abaya", harga: 399000, lokasi: "https://id.shp.ee/8uj4pp6" },
+                    { jenis: "Khimar", harga: 198550, lokasi: "https://id.shp.ee/BGVU1W8" }
                 ]
             },
             {
                 kelompok: "Nightwear",
                 items: [
-                    { jenis: "Latifa Set", harga: "Rp 167.400", lokasi: "https://id.shp.ee/yFqhNGM" }
+                    { jenis: "Latifa Set", harga: 167400, lokasi: "https://id.shp.ee/yFqhNGM" }
                 ]
             },
             {
                 kelompok: "Perlengkapan Sholat",
                 items: [
-                    { jenis: "Mukena Alluna", harga: "Rp 141.075", lokasi: "https://id.shp.ee/hiHtUHX"}
+                    { jenis: "Mukena Alluna", harga: 141075, lokasi: "https://id.shp.ee/hiHtUHX"}
                 ]
             }
         ];
@@ -109,11 +116,21 @@
             localStorage.setItem('seserahanChecklist', JSON.stringify(status));
         }
 
+        function formatRupiah(angka) {
+            return 'Rp ' + angka.toLocaleString('id-ID');
+        }
+
+        function hitungTotalHarga() {
+            let total = seserahan.reduce((acc, kelompok) => {
+                return acc + kelompok.items.reduce((sum, item) => sum + item.harga, 0);
+            }, 0);
+            document.getElementById('total-harga').textContent = formatRupiah(total);
+        }
+
         const checklistStatus = loadChecklistStatus();
 
-        const container = document.getElementById('kelompok-seserahan');
-
         function renderSeserahan() {
+            const container = document.getElementById('kelompok-seserahan');
             container.innerHTML = '';
             seserahan.forEach((kelompok, kelompokIndex) => {
                 const heading = document.createElement('h2');
@@ -121,19 +138,8 @@
                 container.appendChild(heading);
 
                 const table = document.createElement('table');
-                const thead = `
-                    <thead>
-                        <tr>
-                            <th>JENIS BARANG</th>
-                            <th>HARGA BELI</th>
-                            <th>LOKASI BELI</th>
-                            <th>CHECKLIST</th>
-                        </tr>
-                    </thead>
-                `;
-                table.innerHTML = thead;
+                table.innerHTML = `<thead><tr><th>JENIS BARANG</th><th>HARGA BELI</th><th>LOKASI BELI</th><th>CHECKLIST</th></tr></thead>`;
                 const tbody = document.createElement('tbody');
-
                 kelompok.items.forEach((item, itemIndex) => {
                     const itemId = `${kelompokIndex}-${itemIndex}`;
                     const isChecked = checklistStatus[itemId] || false;
@@ -141,7 +147,7 @@
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td class="${isChecked ? 'checked' : ''}">${item.jenis}</td>
-                        <td>${item.harga}</td>
+                        <td>${formatRupiah(item.harga)}</td>
                         <td><a href="${item.lokasi}" target="_blank">Beli di sini</a></td>
                         <td class="checkbox">
                             <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleChecklist('${itemId}')">
@@ -149,10 +155,10 @@
                     `;
                     tbody.appendChild(row);
                 });
-
                 table.appendChild(tbody);
                 container.appendChild(table);
             });
+            hitungTotalHarga();
         }
 
         function toggleChecklist(itemId) {
