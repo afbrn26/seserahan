@@ -200,9 +200,11 @@
 
         function updateSaldo() {
             let saldoAwal = parseInt(document.getElementById('saldo-awal').value) || 0;
+            console.log("Saldo yang dimasukkan: ", saldoAwal);  // Debug log
             localStorage.setItem('saldoAwal', saldoAwal);
             hitungSaldoSisa();
         }
+        
 
         window.onload = function() {
             document.getElementById('saldo-awal').value = localStorage.getItem('saldoAwal') || 0;
