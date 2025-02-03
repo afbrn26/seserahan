@@ -9,7 +9,7 @@
             font-family: Arial, sans-serif;
             background-color: #f7f3e9;
             color: #5c5c3d;
-            margin: 10px;
+            margin: 20px;
         }
         h1 {
             text-align: center;
@@ -20,37 +20,19 @@
             text-align: center;
             text-transform: uppercase;
         }
-        .container {
-            max-width: 600px;
-            margin: auto;
-            padding: 10px;
-        }
-        .saldo {
-            text-align: center;
-            font-size: 16px;
-            font-weight: bold;
-            margin-top: 10px;
-        }
-        input[type="number"] {
-            width: 100%;
-            max-width: 200px;
-            padding: 5px;
-            font-size: 16px;
-            text-align: center;
-            margin-top: 5px;
-        }
         table {
             width: 100%;
             border-collapse: collapse;
             background-color: #fff;
             border-radius: 8px;
+            overflow: hidden;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
         }
         th, td {
             border: 1px solid #e6dfcf;
-            padding: 8px;
+            padding: 10px;
             text-align: center;
-            font-size: 14px;
         }
         th {
             background-color: #f0e6d2;
@@ -58,7 +40,7 @@
         td a {
             color: #8b7d6b;
             text-decoration: none;
-            font-size: 13px; /* Ukuran font link lebih kecil */
+            font-size: 13px;
         }
         td a:hover {
             text-decoration: underline;
@@ -71,42 +53,46 @@
             transform: scale(1.2);
             cursor: pointer;
         }
-        .total-harga, .saldo-sisa {
+        .saldo-container {
             text-align: center;
-            font-size: 16px;
+            font-size: 18px;
             font-weight: bold;
-            margin-top: 10px;
+            margin-bottom: 20px;
         }
-        @media (max-width: 600px) {
-            h1, h2 {
-                font-size: 18px;
-            }
-            th, td {
-                font-size: 12px;
-                padding: 6px;
-            }
-            input[type="number"] {
-                font-size: 14px;
-                padding: 5px;
-            }
+        input[type="number"] {
+            width: 150px;
+            padding: 5px;
+            font-size: 16px;
+            text-align: center;
+        }
+        button {
+            padding: 5px 10px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #8b7d6b;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin-left: 10px;
+        }
+        button:hover {
+            background-color: #6c6254;
         }
     </style>
 </head>
 <body>
-
     <h1>Daftar Seserahan Destya</h1>
-    
-    <div class="container">
-        <div class="saldo">
-            <label for="saldo-awal">Jumlah Uang Tersedia:</label><br>
-            <input type="number" id="saldo-awal" value="1000000">
-        </div>
-        
-        <div id="kelompok-seserahan"></div>
-        
-        <div class="total-harga">Total Harga: <span id="total-harga">Rp 0</span></div>
-        <div class="saldo-sisa">Saldo Sisa: <span id="saldo-sisa">Rp 0</span></div>
+
+    <div class="saldo-container">
+        <label for="saldo-awal">Jumlah Uang Tersedia:</label>
+        <input type="number" id="saldo-awal" value="0">
+        <button onclick="updateSaldo()">OK</button>
     </div>
+
+    <div id="kelompok-seserahan"></div>
+
+    <div class="saldo-container">Total Harga: <span id="total-harga">Rp 0</span></div>
+    <div class="saldo-container">Saldo Sisa: <span id="saldo-sisa">Rp 0</span></div>
 
     <script>
         const seserahan = [
@@ -121,6 +107,20 @@
                 kelompok: "Nightwear",
                 items: [
                     { jenis: "Latifa Set", harga: 167400, lokasi: "https://id.shp.ee/yFqhNGM" }
+                ]
+            },
+            {
+                kelompok: "Perlengkapan Sholat",
+                items: [
+                    { jenis: "Mukena Alluna", harga: 141075, lokasi: "https://id.shp.ee/hiHtUHX"},
+                    { jenis: "Kitab Fiqih Wanita", harga: 120785, lokasi: "https://id.shp.ee/GphiXm2"}
+                ]
+            },
+            {
+                kelompok: "Tas + Dompet",
+                items: [
+                    { jenis: "Tas CEKA", harga: 161684, lokasi: "https://id.shp.ee/vTqKXi3" },
+                    { jenis: "Dompet CEKA", harga: 100468, lokasi: "https://id.shp.ee/yGqFBqy" }
                 ]
             }
         ];
@@ -137,18 +137,24 @@
             return 'Rp ' + angka.toLocaleString('id-ID');
         }
 
-        function hitungSaldoSisa() {
-            let saldoAwal = parseInt(document.getElementById('saldo-awal').value) || 0;
-            let totalDikurangi = Object.keys(checklistStatus).reduce((total, key) => {
-                if (checklistStatus[key]) {
-                    let [kelompokIndex, itemIndex] = key.split('-').map(Number);
-                    total += seserahan[kelompokIndex].items[itemIndex].harga;
-                }
-                return total;
-            }, 0);
+        function hitungTotalHarga() {
+            let total = seserahan.reduce((acc, kelompok) => 
+                acc + kelompok.items.reduce((sum, item) => sum + item.harga, 0), 0);
+            document.getElementById('total-harga').textContent = formatRupiah(total);
+        }
 
+        function hitungSaldoSisa() {
+            let saldoAwal = parseInt(localStorage.getItem('saldoAwal')) || 0;
+            let totalDikurangi = 0;
+            for (const key in checklistStatus) {
+                if (checklistStatus[key]) {
+                    const [kelompokIndex, itemIndex] = key.split('-').map(Number);
+                    totalDikurangi += seserahan[kelompokIndex].items[itemIndex].harga;
+                }
+            }
             let saldoSisa = saldoAwal - totalDikurangi;
             document.getElementById('saldo-sisa').textContent = formatRupiah(saldoSisa);
+            document.getElementById('saldo-terbaru').textContent = formatRupiah(saldoAwal);
         }
 
         const checklistStatus = loadChecklistStatus();
@@ -182,6 +188,7 @@
                 table.appendChild(tbody);
                 container.appendChild(table);
             });
+            hitungTotalHarga();
             hitungSaldoSisa();
         }
 
@@ -192,14 +199,15 @@
         }
 
         function updateSaldo() {
+            let saldoAwal = parseInt(document.getElementById('saldo-awal').value) || 0;
+            localStorage.setItem('saldoAwal', saldoAwal);
             hitungSaldoSisa();
         }
 
-        document.getElementById('saldo-awal').addEventListener('input', hitungSaldoSisa);
-        document.getElementById('saldo-awal').addEventListener('change', hitungSaldoSisa);
-
-        renderSeserahan();
+        window.onload = function() {
+            document.getElementById('saldo-awal').value = localStorage.getItem('saldoAwal') || 0;
+            renderSeserahan();
+        };
     </script>
-
 </body>
 </html>
