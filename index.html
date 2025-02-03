@@ -84,7 +84,7 @@
     <h1>Daftar Seserahan Destya</h1>
 
     <div class="saldo-container">
-        <label for="saldo-awal">Jumlah Uang Tersedia:</label>
+        <label for="saldo-awal">Uang Tersedia:</label>
         <input type="number" id="saldo-awal" value="0">
         <button onclick="updateSaldo()">OK</button>
     </div>
@@ -198,16 +198,20 @@
         function toggleChecklist(itemId) {
             checklistStatus[itemId] = !checklistStatus[itemId];
             saveChecklistStatus(checklistStatus);
-            renderSeserahan();
-        }
-
-        function updateSaldo() {
-            let saldoAwal = parseInt(document.getElementById('saldo-awal').value) || 0;
-            console.log("Saldo yang dimasukkan: ", saldoAwal);  // Debug log
-            localStorage.setItem('saldoAwal', saldoAwal);
-            hitungSaldoSisa();
+            renderSeserahan();  // Pastikan render kembali setelah status berubah
         }
         
+        function updateSaldo() {
+            let saldoAwal = parseInt(document.getElementById('saldo-awal').value) || 0;
+            localStorage.setItem('saldoAwal', saldoAwal);
+            renderSeserahan();  // Render ulang setelah saldo di-update
+        }        
+
+        if (typeof(Storage) !== "undefined") {
+            console.log("localStorage is available");
+        } else {
+            console.log("localStorage is not supported");
+        }        
 
         window.onload = function() {
             document.getElementById('saldo-awal').value = localStorage.getItem('saldoAwal') || 0;
