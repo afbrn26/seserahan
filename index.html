@@ -7,24 +7,21 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f7f3e9; /* Latar belakang cream */
+            background-color: #f7f3e9;
             color: #5c5c3d;
             margin: 20px;
         }
         h1 {
             text-align: center;
             color: #8b7d6b;
-            margin-bottom: 20px;
         }
         h2 {
             color: #8b7d6b;
             text-align: center;
-            margin: 20px 0;
             text-transform: uppercase;
-            font-size: 1.2em;
         }
         table {
-            width: 100%; /* Full width untuk layar kecil */
+            width: 100%;
             margin: 0 auto 20px;
             border-collapse: collapse;
             background-color: #fff;
@@ -36,7 +33,6 @@
             border: 1px solid #e6dfcf;
             padding: 10px;
             text-align: center;
-            font-size: 14px; /* Ukuran font lebih kecil untuk layar kecil */
         }
         th {
             background-color: #f0e6d2;
@@ -57,32 +53,32 @@
             transform: scale(1.2);
             cursor: pointer;
         }
-        .total-harga {
+        .total-harga, .saldo {
             text-align: center;
             font-size: 18px;
             font-weight: bold;
             margin-top: 20px;
         }
-        @media (max-width: 600px) {
-            th, td {
-                font-size: 12px; /* Ukuran font lebih kecil untuk layar kecil */
-                padding: 8px;
-            }
-            h1, h2 {
-                font-size: 18px; /* Ukuran heading lebih kecil */
-            }
-            table {
-                width: 100%; /* Lebar penuh untuk layar kecil */
-            }
+        input[type="number"] {
+            width: 150px;
+            padding: 5px;
+            font-size: 16px;
+            text-align: center;
         }
     </style>
 </head>
 <body>
     <h1>Daftar Seserahan Destya</h1>
-    <div id="kelompok-seserahan">
-        <!-- Kelompok data akan diisi dengan JavaScript -->
+
+    <div class="saldo">
+        <label for="saldo-awal">Jumlah Uang Tersedia: </label>
+        <input type="number" id="saldo-awal" value="1000000" oninput="updateSaldo()">
     </div>
+
+    <div id="kelompok-seserahan"></div>
+
     <div class="total-harga">Total Harga: <span id="total-harga">Rp 0</span></div>
+    <div class="saldo">Saldo Sisa: <span id="saldo-sisa">Rp 0</span></div>
 
     <script>
         const seserahan = [
@@ -109,8 +105,8 @@
             {
                 kelompok: "Tas + Dompet",
                 items: [
-                    {jenis: "Tas CEKA", harga: 161684, lokasi: "https://id.shp.ee/vTqKXi3"},
-                    {jenis: "Dompet CEKA", harga: 100468, lokasi: "https://id.shp.ee/yGqFBqy"}
+                    { jenis: "Tas CEKA", harga: 161684, lokasi: "https://id.shp.ee/vTqKXi3" },
+                    { jenis: "Dompet CEKA", harga: 100468, lokasi: "https://id.shp.ee/yGqFBqy" }
                 ]
             }
         ];
@@ -133,6 +129,19 @@
                 return acc + kelompok.items.reduce((sum, item) => sum + item.harga, 0);
             }, 0);
             document.getElementById('total-harga').textContent = formatRupiah(total);
+        }
+
+        function hitungSaldoSisa() {
+            let saldoAwal = parseInt(document.getElementById('saldo-awal').value) || 0;
+            let totalDikurangi = 0;
+            for (const key in checklistStatus) {
+                if (checklistStatus[key]) {
+                    const [kelompokIndex, itemIndex] = key.split('-').map(Number);
+                    totalDikurangi += seserahan[kelompokIndex].items[itemIndex].harga;
+                }
+            }
+            let saldoSisa = saldoAwal - totalDikurangi;
+            document.getElementById('saldo-sisa').textContent = formatRupiah(saldoSisa);
         }
 
         const checklistStatus = loadChecklistStatus();
@@ -167,12 +176,17 @@
                 container.appendChild(table);
             });
             hitungTotalHarga();
+            hitungSaldoSisa();
         }
 
         function toggleChecklist(itemId) {
             checklistStatus[itemId] = !checklistStatus[itemId];
             saveChecklistStatus(checklistStatus);
             renderSeserahan();
+        }
+
+        function updateSaldo() {
+            hitungSaldoSisa();
         }
 
         renderSeserahan();
