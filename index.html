@@ -84,9 +84,8 @@
     <h1>Daftar Seserahan Destya</h1>
 
     <div class="saldo-container">
-        <label for="saldo-awal">Uang Tersedia:</label>
-        <input type="number" id="saldo-awal" value="0">
-        <button onclick="updateSaldo()">OK</button>
+        <p>Uang Tersedia: Rp <span id="saldo-awal">1000000</span></p>
+        <button onclick="updateSaldo()">Update Saldo</button>
     </div>
 
     <div id="kelompok-seserahan"></div>
@@ -113,7 +112,7 @@
                 kelompok: "Perlengkapan Sholat",
                 items: [
                     { jenis: "Mukena Alluna", harga: 141075, lokasi: "https://id.shp.ee/hiHtUHX"},
-                    { jenis: "Kitab Fiqih Wanita", harga: 120785, lokasi: "https://id.shp.ee/GphiXm2"}
+                    { jenis: "Kitab Fiqih Wanita", harga: 120785, lokasi: "https://id.shp.ee/GphiXm2" }
                 ]
             },
             {
@@ -125,13 +124,9 @@
             }
         ];
 
-        function loadChecklistStatus() {
-            return JSON.parse(localStorage.getItem('seserahanChecklist')) || {};
-        }
-
-        function saveChecklistStatus(status) {
-            localStorage.setItem('seserahanChecklist', JSON.stringify(status));
-        }
+        // Menyimpan saldo awal di localStorage
+        let saldoAwal = localStorage.getItem('saldoAwal') ? parseInt(localStorage.getItem('saldoAwal')) : 1000000;
+        document.getElementById('saldo-awal').textContent = formatRupiah(saldoAwal);
 
         function formatRupiah(angka) {
             return 'Rp ' + angka.toLocaleString('id-ID');
@@ -144,8 +139,6 @@
         }
 
         function hitungSaldoSisa() {
-            let saldoAwal = parseInt(localStorage.getItem('saldoAwal')) || 0;
-            console.log("Saldo Awal: ", saldoAwal);  // Debug log
             let totalDikurangi = 0;
             for (const key in checklistStatus) {
                 if (checklistStatus[key]) {
@@ -154,13 +147,10 @@
                 }
             }
             let saldoSisa = saldoAwal - totalDikurangi;
-            console.log("Saldo Sisa: ", saldoSisa);  // Debug log
             document.getElementById('saldo-sisa').textContent = formatRupiah(saldoSisa);
-            document.getElementById('saldo-terbaru').textContent = formatRupiah(saldoAwal);
         }
-        
 
-        const checklistStatus = loadChecklistStatus();
+        const checklistStatus = JSON.parse(localStorage.getItem('seserahanChecklist')) || {};
 
         function renderSeserahan() {
             const container = document.getElementById('kelompok-seserahan');
@@ -197,24 +187,18 @@
 
         function toggleChecklist(itemId) {
             checklistStatus[itemId] = !checklistStatus[itemId];
-            saveChecklistStatus(checklistStatus);
-            renderSeserahan();  // Pastikan render kembali setelah status berubah
+            localStorage.setItem('seserahanChecklist', JSON.stringify(checklistStatus));
+            renderSeserahan();
         }
-        
-        function updateSaldo() {
-            let saldoAwal = parseInt(document.getElementById('saldo-awal').value) || 0;
-            localStorage.setItem('saldoAwal', saldoAwal);
-            renderSeserahan();  // Render ulang setelah saldo di-update
-        }        
 
-        if (typeof(Storage) !== "undefined") {
-            console.log("localStorage is available");
-        } else {
-            console.log("localStorage is not supported");
-        }        
+        function updateSaldo() {
+            saldoAwal = parseInt(prompt("Masukkan saldo uang tersedia:", saldoAwal)) || saldoAwal;
+            localStorage.setItem('saldoAwal', saldoAwal);
+            document.getElementById('saldo-awal').textContent = formatRupiah(saldoAwal);
+            renderSeserahan();
+        }
 
         window.onload = function() {
-            document.getElementById('saldo-awal').value = localStorage.getItem('saldoAwal') || 0;
             renderSeserahan();
         };
     </script>
