@@ -124,9 +124,13 @@
             }
         ];
 
-        // Menyimpan saldo awal di localStorage
-        let saldoAwal = localStorage.getItem('saldoAwal') ? parseInt(localStorage.getItem('saldoAwal')) : 1000000;
-        document.getElementById('saldo-awal').textContent = formatRupiah(saldoAwal);
+        function loadSaldo() {
+            return parseInt(localStorage.getItem('saldoAwal')) || 1000000; // Default value if not set
+        }
+
+        function saveSaldo(saldo) {
+            localStorage.setItem('saldoAwal', saldo);
+        }
 
         function formatRupiah(angka) {
             return 'Rp ' + angka.toLocaleString('id-ID');
@@ -139,6 +143,7 @@
         }
 
         function hitungSaldoSisa() {
+            let saldoAwal = loadSaldo();
             let totalDikurangi = 0;
             for (const key in checklistStatus) {
                 if (checklistStatus[key]) {
@@ -192,10 +197,11 @@
         }
 
         function updateSaldo() {
-            saldoAwal = parseInt(prompt("Masukkan saldo uang tersedia:", saldoAwal)) || saldoAwal;
-            localStorage.setItem('saldoAwal', saldoAwal);
-            document.getElementById('saldo-awal').textContent = formatRupiah(saldoAwal);
-            renderSeserahan();
+            let saldoAwal = loadSaldo();
+            saldoAwal = saldoAwal;
+            saveSaldo(saldoAwal);  // Save the updated saldo
+            document.getElementById('saldo-awal').textContent = formatRupiah(saldoAwal);  // Update the display
+            renderSeserahan();  // Render ulang setelah saldo di-update
         }
 
         window.onload = function() {
