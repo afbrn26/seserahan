@@ -7,32 +7,36 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f7f3e9;
+            background-color: #f7f3e9; /* Latar belakang cream */
             color: #5c5c3d;
             margin: 20px;
         }
         h1 {
             text-align: center;
             color: #8b7d6b;
+            margin-bottom: 20px;
         }
         h2 {
             color: #8b7d6b;
             text-align: center;
+            margin: 20px 0;
             text-transform: uppercase;
+            font-size: 1.2em;
         }
         table {
-            width: 100%;
+            width: 100%; /* Full width untuk layar kecil */
+            margin: 0 auto 20px;
             border-collapse: collapse;
             background-color: #fff;
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
         }
         th, td {
             border: 1px solid #e6dfcf;
             padding: 10px;
             text-align: center;
+            font-size: 14px; /* Ukuran font lebih kecil untuk layar kecil */
         }
         th {
             background-color: #f0e6d2;
@@ -40,7 +44,7 @@
         td a {
             color: #8b7d6b;
             text-decoration: none;
-            font-size: 13px;
+            font-size: 13px; /* Ukuran font link lebih kecil */
         }
         td a:hover {
             text-decoration: underline;
@@ -53,47 +57,44 @@
             transform: scale(1.2);
             cursor: pointer;
         }
-        .saldo-container {
+        .total-harga {
             text-align: center;
             font-size: 18px;
             font-weight: bold;
-            margin-bottom: 20px;
+            margin-top: 20px;
         }
-        input[type="number"] {
-            width: 150px;
-            padding: 5px;
-            font-size: 16px;
+        .saldo {
             text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
         }
-        button {
-            padding: 5px 10px;
-            font-size: 16px;
-            cursor: pointer;
-            background-color: #8b7d6b;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            margin-left: 10px;
-        }
-        button:hover {
-            background-color: #6c6254;
+        @media (max-width: 600px) {
+            th, td {
+                font-size: 12px; /* Ukuran font lebih kecil untuk layar kecil */
+                padding: 8px;
+            }
+            h1, h2 {
+                font-size: 18px; /* Ukuran heading lebih kecil */
+            }
+            table {
+                width: 100%; /* Lebar penuh untuk layar kecil */
+            }
         }
     </style>
 </head>
 <body>
     <h1>Daftar Seserahan Destya</h1>
-
-    <div class="saldo-container">
-        <p>Uang Tersedia: Rp <span id="saldo-awal">1000000</span></p>
-        <button onclick="updateSaldo()">Update Saldo</button>
+    <div id="kelompok-seserahan">
+        <!-- Kelompok data akan diisi dengan JavaScript -->
     </div>
-
-    <div id="kelompok-seserahan"></div>
-
-    <div class="saldo-container">Total Harga: <span id="total-harga">Rp 0</span></div>
-    <div class="saldo-container">Saldo Sisa: <span id="saldo-sisa">Rp 0</span></div>
+    <div class="total-harga">Total Harga: <span id="total-harga">Rp 0</span></div>
+    <div class="saldo">Saldo Anda: <span id="saldo">Rp 1.500.000</span></div>
 
     <script>
+        const saldoAwal = 1500000; // Saldo awal
+        let saldo = saldoAwal; // Saldo yang dapat digunakan
+
         const seserahan = [
             {
                 kelompok: "Dailywear",
@@ -112,24 +113,25 @@
                 kelompok: "Perlengkapan Sholat",
                 items: [
                     { jenis: "Mukena Alluna", harga: 141075, lokasi: "https://id.shp.ee/hiHtUHX"},
-                    { jenis: "Kitab Fiqih Wanita", harga: 120785, lokasi: "https://id.shp.ee/GphiXm2" }
+                    { jenis: "Kitab Fiqih Wanita", harga: 120785, lokasi: "https://id.shp.ee/GphiXm2"}
                 ]
             },
             {
                 kelompok: "Tas + Dompet",
                 items: [
-                    { jenis: "Tas CEKA", harga: 161684, lokasi: "https://id.shp.ee/vTqKXi3" },
-                    { jenis: "Dompet CEKA", harga: 100468, lokasi: "https://id.shp.ee/yGqFBqy" }
+                    {jenis: "Tas CEKA", harga: 161684, lokasi: "https://id.shp.ee/vTqKXi3"},
+                    {jenis: "Dompet CEKA", harga: 100468, lokasi: "https://id.shp.ee/yGqFBqy"}
                 ]
             }
         ];
 
-        function loadSaldo() {
-            return parseInt(localStorage.getItem('saldoAwal')) || 1000000; // Default value if not set
+        function loadChecklistStatus() {
+            const savedStatus = localStorage.getItem('seserahanChecklist');
+            return savedStatus ? JSON.parse(savedStatus) : {};
         }
 
-        function saveSaldo(saldo) {
-            localStorage.setItem('saldoAwal', saldo);
+        function saveChecklistStatus(status) {
+            localStorage.setItem('seserahanChecklist', JSON.stringify(status));
         }
 
         function formatRupiah(angka) {
@@ -137,30 +139,26 @@
         }
 
         function hitungTotalHarga() {
-            let total = seserahan.reduce((acc, kelompok) => 
-                acc + kelompok.items.reduce((sum, item) => sum + item.harga, 0), 0);
+            let total = 0;
+            seserahan.forEach(kelompok => {
+                kelompok.items.forEach(item => {
+                    const itemId = `${kelompok.kelompok}-${item.jenis}`;
+                    if (checklistStatus[itemId]) {
+                        total += item.harga;
+                    }
+                });
+            });
             document.getElementById('total-harga').textContent = formatRupiah(total);
+            saldo = saldoAwal - total; // Mengurangi saldo sesuai total harga yang dipilih
+            document.getElementById('saldo').textContent = formatRupiah(saldo);
         }
 
-        function hitungSaldoSisa() {
-            let saldoAwal = loadSaldo();
-            let totalDikurangi = 0;
-            for (const key in checklistStatus) {
-                if (checklistStatus[key]) {
-                    const [kelompokIndex, itemIndex] = key.split('-').map(Number);
-                    totalDikurangi += seserahan[kelompokIndex].items[itemIndex].harga;
-                }
-            }
-            let saldoSisa = saldoAwal - totalDikurangi;
-            document.getElementById('saldo-sisa').textContent = formatRupiah(saldoSisa);
-        }
-
-        const checklistStatus = JSON.parse(localStorage.getItem('seserahanChecklist')) || {};
+        const checklistStatus = loadChecklistStatus();
 
         function renderSeserahan() {
             const container = document.getElementById('kelompok-seserahan');
             container.innerHTML = '';
-            seserahan.forEach((kelompok, kelompokIndex) => {
+            seserahan.forEach(kelompok => {
                 const heading = document.createElement('h2');
                 heading.textContent = kelompok.kelompok;
                 container.appendChild(heading);
@@ -168,8 +166,8 @@
                 const table = document.createElement('table');
                 table.innerHTML = `<thead><tr><th>JENIS BARANG</th><th>HARGA BELI</th><th>LOKASI BELI</th><th>CHECKLIST</th></tr></thead>`;
                 const tbody = document.createElement('tbody');
-                kelompok.items.forEach((item, itemIndex) => {
-                    const itemId = `${kelompokIndex}-${itemIndex}`;
+                kelompok.items.forEach(item => {
+                    const itemId = `${kelompok.kelompok}-${item.jenis}`;
                     const isChecked = checklistStatus[itemId] || false;
 
                     const row = document.createElement('tr');
@@ -187,26 +185,15 @@
                 container.appendChild(table);
             });
             hitungTotalHarga();
-            hitungSaldoSisa();
         }
 
         function toggleChecklist(itemId) {
             checklistStatus[itemId] = !checklistStatus[itemId];
-            localStorage.setItem('seserahanChecklist', JSON.stringify(checklistStatus));
+            saveChecklistStatus(checklistStatus);
             renderSeserahan();
         }
 
-        function updateSaldo() {
-            let saldoAwal = loadSaldo();
-            saldoAwal = saldoAwal;
-            saveSaldo(saldoAwal);  // Save the updated saldo
-            document.getElementById('saldo-awal').textContent = formatRupiah(saldoAwal);  // Update the display
-            renderSeserahan();  // Render ulang setelah saldo di-update
-        }
-
-        window.onload = function() {
-            renderSeserahan();
-        };
+        renderSeserahan();
     </script>
 </body>
 </html>
