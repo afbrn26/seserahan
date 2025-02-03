@@ -39,9 +39,6 @@
             text-align: center;
             margin-top: 5px;
         }
-        .table-container {
-            overflow-x: auto;
-        }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -102,7 +99,7 @@
     <div class="container">
         <div class="saldo">
             <label for="saldo-awal">Jumlah Uang Tersedia:</label><br>
-            <input type="number" id="saldo-awal" value="1000000" oninput="updateSaldo()">
+            <input type="number" id="saldo-awal" value="1000000">
         </div>
         
         <div id="kelompok-seserahan"></div>
@@ -125,26 +122,11 @@
                 items: [
                     { jenis: "Latifa Set", harga: 167400, lokasi: "https://id.shp.ee/yFqhNGM" }
                 ]
-            },
-            {
-                kelompok: "Perlengkapan Sholat",
-                items: [
-                    { jenis: "Mukena Alluna", harga: 141075, lokasi: "https://id.shp.ee/hiHtUHX"},
-                    { jenis: "Kitab Fiqih Wanita", harga: 120785, lokasi: "https://id.shp.ee/GphiXm2"}
-                ]
-            },
-            {
-                kelompok: "Tas + Dompet",
-                items: [
-                    { jenis: "Tas CEKA", harga: 161684, lokasi: "https://id.shp.ee/vTqKXi3" },
-                    { jenis: "Dompet CEKA", harga: 100468, lokasi: "https://id.shp.ee/yGqFBqy" }
-                ]
             }
         ];
 
         function loadChecklistStatus() {
-            const savedStatus = localStorage.getItem('seserahanChecklist');
-            return savedStatus ? JSON.parse(savedStatus) : {};
+            return JSON.parse(localStorage.getItem('seserahanChecklist')) || {};
         }
 
         function saveChecklistStatus(status) {
@@ -157,13 +139,14 @@
 
         function hitungSaldoSisa() {
             let saldoAwal = parseInt(document.getElementById('saldo-awal').value) || 0;
-            let totalDikurangi = 0;
-            for (const key in checklistStatus) {
+            let totalDikurangi = Object.keys(checklistStatus).reduce((total, key) => {
                 if (checklistStatus[key]) {
-                    const [kelompokIndex, itemIndex] = key.split('-').map(Number);
-                    totalDikurangi += seserahan[kelompokIndex].items[itemIndex].harga;
+                    let [kelompokIndex, itemIndex] = key.split('-').map(Number);
+                    total += seserahan[kelompokIndex].items[itemIndex].harga;
                 }
-            }
+                return total;
+            }, 0);
+
             let saldoSisa = saldoAwal - totalDikurangi;
             document.getElementById('saldo-sisa').textContent = formatRupiah(saldoSisa);
         }
@@ -177,9 +160,6 @@
                 const heading = document.createElement('h2');
                 heading.textContent = kelompok.kelompok;
                 container.appendChild(heading);
-
-                const tableContainer = document.createElement('div');
-                tableContainer.classList.add("table-container");
 
                 const table = document.createElement('table');
                 table.innerHTML = `<thead><tr><th>JENIS BARANG</th><th>HARGA BELI</th><th>LOKASI BELI</th><th>CHECKLIST</th></tr></thead>`;
@@ -200,8 +180,7 @@
                     tbody.appendChild(row);
                 });
                 table.appendChild(tbody);
-                tableContainer.appendChild(table);
-                container.appendChild(tableContainer);
+                container.appendChild(table);
             });
             hitungSaldoSisa();
         }
@@ -215,6 +194,9 @@
         function updateSaldo() {
             hitungSaldoSisa();
         }
+
+        document.getElementById('saldo-awal').addEventListener('input', hitungSaldoSisa);
+        document.getElementById('saldo-awal').addEventListener('change', hitungSaldoSisa);
 
         renderSeserahan();
     </script>
