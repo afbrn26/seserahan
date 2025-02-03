@@ -145,6 +145,7 @@
 
         function hitungSaldoSisa() {
             let saldoAwal = parseInt(localStorage.getItem('saldoAwal')) || 0;
+            console.log("Saldo Awal: ", saldoAwal);  // Debug log
             let totalDikurangi = 0;
             for (const key in checklistStatus) {
                 if (checklistStatus[key]) {
@@ -153,9 +154,11 @@
                 }
             }
             let saldoSisa = saldoAwal - totalDikurangi;
+            console.log("Saldo Sisa: ", saldoSisa);  // Debug log
             document.getElementById('saldo-sisa').textContent = formatRupiah(saldoSisa);
             document.getElementById('saldo-terbaru').textContent = formatRupiah(saldoAwal);
         }
+        
 
         const checklistStatus = loadChecklistStatus();
 
