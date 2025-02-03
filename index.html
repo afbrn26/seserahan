@@ -9,7 +9,7 @@
             font-family: Arial, sans-serif;
             background-color: #f7f3e9;
             color: #5c5c3d;
-            margin: 20px;
+            margin: 10px;
         }
         h1 {
             text-align: center;
@@ -20,19 +20,40 @@
             text-align: center;
             text-transform: uppercase;
         }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 10px;
+        }
+        .saldo {
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        input[type="number"] {
+            width: 100%;
+            max-width: 200px;
+            padding: 5px;
+            font-size: 16px;
+            text-align: center;
+            margin-top: 5px;
+        }
+        .table-container {
+            overflow-x: auto;
+        }
         table {
             width: 100%;
-            margin: 0 auto 20px;
             border-collapse: collapse;
             background-color: #fff;
             border-radius: 8px;
-            overflow: hidden;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         th, td {
             border: 1px solid #e6dfcf;
-            padding: 10px;
+            padding: 8px;
             text-align: center;
+            font-size: 14px;
         }
         th {
             background-color: #f0e6d2;
@@ -53,32 +74,42 @@
             transform: scale(1.2);
             cursor: pointer;
         }
-        .total-harga, .saldo {
+        .total-harga, .saldo-sisa {
             text-align: center;
-            font-size: 18px;
-            font-weight: bold;
-            margin-top: 20px;
-        }
-        input[type="number"] {
-            width: 150px;
-            padding: 5px;
             font-size: 16px;
-            text-align: center;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        @media (max-width: 600px) {
+            h1, h2 {
+                font-size: 18px;
+            }
+            th, td {
+                font-size: 12px;
+                padding: 6px;
+            }
+            input[type="number"] {
+                font-size: 14px;
+                padding: 5px;
+            }
         }
     </style>
 </head>
 <body>
+
     <h1>Daftar Seserahan Destya</h1>
-
-    <div class="saldo">
-        <label for="saldo-awal">Jumlah Uang Tersedia: </label>
-        <input type="number" id="saldo-awal" value="1000000" oninput="updateSaldo()">
+    
+    <div class="container">
+        <div class="saldo">
+            <label for="saldo-awal">Jumlah Uang Tersedia:</label><br>
+            <input type="number" id="saldo-awal" value="1000000" oninput="updateSaldo()">
+        </div>
+        
+        <div id="kelompok-seserahan"></div>
+        
+        <div class="total-harga">Total Harga: <span id="total-harga">Rp 0</span></div>
+        <div class="saldo-sisa">Saldo Sisa: <span id="saldo-sisa">Rp 0</span></div>
     </div>
-
-    <div id="kelompok-seserahan"></div>
-
-    <div class="total-harga">Total Harga: <span id="total-harga">Rp 0</span></div>
-    <div class="saldo">Saldo Sisa: <span id="saldo-sisa">Rp 0</span></div>
 
     <script>
         const seserahan = [
@@ -124,13 +155,6 @@
             return 'Rp ' + angka.toLocaleString('id-ID');
         }
 
-        function hitungTotalHarga() {
-            let total = seserahan.reduce((acc, kelompok) => {
-                return acc + kelompok.items.reduce((sum, item) => sum + item.harga, 0);
-            }, 0);
-            document.getElementById('total-harga').textContent = formatRupiah(total);
-        }
-
         function hitungSaldoSisa() {
             let saldoAwal = parseInt(document.getElementById('saldo-awal').value) || 0;
             let totalDikurangi = 0;
@@ -154,6 +178,9 @@
                 heading.textContent = kelompok.kelompok;
                 container.appendChild(heading);
 
+                const tableContainer = document.createElement('div');
+                tableContainer.classList.add("table-container");
+
                 const table = document.createElement('table');
                 table.innerHTML = `<thead><tr><th>JENIS BARANG</th><th>HARGA BELI</th><th>LOKASI BELI</th><th>CHECKLIST</th></tr></thead>`;
                 const tbody = document.createElement('tbody');
@@ -173,9 +200,9 @@
                     tbody.appendChild(row);
                 });
                 table.appendChild(tbody);
-                container.appendChild(table);
+                tableContainer.appendChild(table);
+                container.appendChild(tableContainer);
             });
-            hitungTotalHarga();
             hitungSaldoSisa();
         }
 
@@ -191,5 +218,6 @@
 
         renderSeserahan();
     </script>
+
 </body>
 </html>
