@@ -89,13 +89,45 @@
         <!-- Kelompok data akan diisi dengan JavaScript -->
     </div>
     <div class="total-harga">Total Harga: <span id="total-harga">Rp 0</span></div>
-    <div class="saldo">Saldo Anda: <span id="saldo">Rp 1.550.000</span></div>
+    <div class="saldo">Saldo Anda: <span id="saldo">Rp 1.500.000</span></div>
 
     <script>
-        const saldoAwal = 1550000; // Saldo awal
+        const saldoAwal = 1500000; // Saldo awal
         let saldo = saldoAwal; // Saldo yang dapat digunakan
 
         const seserahan = [
+            {
+                kelompok: "Body Care",
+                items: [
+                    { jenis: "Body Serum Day & Night", harga: 88000, lokasi: "https://id.shp.ee/JmoVpDP" },
+                    { jenis: "Deodorant", harga: 58725, lokasi: "https://id.shp.ee/L2puF3E" }
+                ]
+            },
+            {
+                kelompok: "Skincare",
+                items: [
+                    { jenis: "Toner", harga: 86000, lokasi: "https://id.shp.ee/apBiJR7" },
+                    { jenis: "Micellar Water + Kapas", harga: 29500, lokasi: "https://id.shp.ee/Ge7ohFJ" },
+                    { jenis: "Facial Wash", harga: 35000, lokasi: "OFFLINE" },
+                    { jenis: "Moiturizer (Brightening + Retinol)", harga: 83500, lokasi: "https://id.shp.ee/Sr4zMgH" },
+                    { jenis: "Sunscreen", harga: 34500, lokasi: "https://id.shp.ee/Bh7WmaZ" },
+                    { jenis: "Lip Spf", harga: 39000, lokasi: "https://id.shp.ee/fvWzeDd" },
+                    { jenis: "Serum 1", harga: 27720, lokasi: "https://id.shp.ee/FdzBbSC" },
+                    { jenis: "Serum 2", harga: 27720, lokasi: "https://id.shp.ee/Pvr4A4b" }
+                ]
+            },
+            {
+                kelompok: "Make Up",
+                items: [
+                    { jenis: "TWC", harga: 51000, lokasi: "https://id.shp.ee/hfJRfoa" },
+                    { jenis: "Mascara", harga: 66000, lokasi: "https://id.shp.ee/9L4HA6B" },
+                    { jenis: "Eyebrow", harga: 30000, lokasi: "https://id.shp.ee/EQ25EoS" },
+                    { jenis: "Skintin", harga: 99440, lokasi: "https://id.shp.ee/9k7WSbf" },
+                    { jenis: "Primer", harga: 84140, lokasi: "https://id.shp.ee/yBE754a" },
+                    { jenis: "Lipcream Base", harga: 53328, lokasi: "https://id.shp.ee/R4Dvg5p" },
+                    { jenis: "Lipcream Ombre", harga: 53328, lokasi: "https://id.shp.ee/R4Dvg5p" }
+                ]
+            },
             {
                 kelompok: "Dailywear",
                 items: [
@@ -104,13 +136,28 @@
                 ]
             },
             {
-                kelompok: "Nightwear",
+                kelompok: "Toiletries",
                 items: [
-                    { jenis: "Latifa Set", harga: 167400, lokasi: "https://id.shp.ee/yFqhNGM" }
+                    { jenis: "Handuk Couple", harga: 220000, lokasi: "https://id.shp.ee/6yRPm2V" },
+                    { jenis: "Shampo & Conditioner", harga: 89000, lokasi: "https://id.shp.ee/gKGicB9" },
+                    { jenis: "Body Wash", harga: 38000, lokasi: "https://id.shp.ee/sA3Tq9v" }
                 ]
             },
             {
-                kelompok: "Perlengkapan Sholat",
+                kelompok: "Underware",
+                items: [
+                    { jenis: "Bra", harga: 55000, lokasi: "https://id.shp.ee/eYmBF9S"},
+                    { jenis: "CD", harga: 21900, lokasi: "https://id.shp.ee/o5K8srn"}
+                ]
+            },
+            {
+                kelompok: "Nightwear",
+                items: [
+                    { jenis: "Baju Tidur", harga: 111507, lokasi: "https://id.shp.ee/wwKBnGh" }
+                ]
+            },
+            {
+                kelompok: "Perlengkapan Ibadah",
                 items: [
                     { jenis: "Mukena Alluna", harga: 141075, lokasi: "https://id.shp.ee/hiHtUHX"},
                     { jenis: "Kitab Fiqih Wanita", harga: 120785, lokasi: "https://id.shp.ee/GphiXm2"}
@@ -174,7 +221,11 @@
                     row.innerHTML = `
                         <td class="${isChecked ? 'checked' : ''}">${item.jenis}</td>
                         <td>${formatRupiah(item.harga)}</td>
-                        <td><a href="${item.lokasi}" target="_blank">Beli di sini</a></td>
+                        <td>${
+                            item.lokasi === "OFFLINE" 
+                            ? "Offline Store" 
+                            : `<a href="${item.lokasi}" target="_blank">Beli di sini</a>`
+                        }</td>
                         <td class="checkbox">
                             <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleChecklist('${itemId}')">
                         </td>
