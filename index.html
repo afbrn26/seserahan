@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f7f3e9; /* Latar belakang cream */
+            background-color: #f7f3e9;
             color: #5c5c3d;
             margin: 20px;
         }
@@ -24,7 +24,7 @@
             font-size: 1.2em;
         }
         table {
-            width: 100%; /* Full width untuk layar kecil */
+            width: 100%; 
             margin: 0 auto 20px;
             border-collapse: collapse;
             background-color: #fff;
@@ -36,7 +36,7 @@
             border: 1px solid #e6dfcf;
             padding: 10px;
             text-align: center;
-            font-size: 14px; /* Ukuran font lebih kecil untuk layar kecil */
+            font-size: 14px; 
         }
         th {
             background-color: #f0e6d2;
@@ -44,7 +44,7 @@
         td a {
             color: #8b7d6b;
             text-decoration: none;
-            font-size: 13px; /* Ukuran font link lebih kecil */
+            font-size: 13px; 
         }
         td a:hover {
             text-decoration: underline;
@@ -71,14 +71,14 @@
         }
         @media (max-width: 600px) {
             th, td {
-                font-size: 12px; /* Ukuran font lebih kecil untuk layar kecil */
+                font-size: 12px;
                 padding: 8px;
             }
             h1, h2 {
-                font-size: 18px; /* Ukuran heading lebih kecil */
+                font-size: 18px; 
             }
             table {
-                width: 100%; /* Lebar penuh untuk layar kecil */
+                width: 100%;
             }
         }
     </style>
@@ -86,7 +86,6 @@
 <body>
     <h1>Daftar Seserahan Destya</h1>
     <div id="kelompok-seserahan">
-        <!-- Kelompok data akan diisi dengan JavaScript -->
     </div>
     <div class="total-harga">Total Harga: <span id="total-harga">Rp 0</span></div>
     <div class="saldo">Saldo Anda: <span id="saldo">Rp 1.550.000</span></div>
@@ -146,8 +145,8 @@
             {
                 kelompok: "Underware",
                 items: [
-                    { jenis: "Bra", harga: 55000, lokasi: "https://id.shp.ee/eYmBF9S"},
-                    { jenis: "CD", harga: 21900, lokasi: "https://id.shp.ee/o5K8srn"}
+                    { jenis: "Bra (2pcs)", harga: 55000, lokasi: "https://id.shp.ee/eYmBF9S"},
+                    { jenis: "CD (5pcs)", harga: 21900, lokasi: "OFFLINE"}
                 ]
             },
             {
@@ -164,6 +163,18 @@
                 ]
             },
             {
+                kelompok: "Footwear",
+                items: [
+                    { jenis: "Flatshoes", harga: 217000, lokasi: "https://id.shp.ee/cZvbCAZ"}
+                ]
+            },
+            {
+                kelompok: "Perlengkapan Tambahan",
+                items: [
+                    { jenis: "Bed Cover", harga: 350000, lokasi: "OFFLINE"}
+                ]
+            },
+            {
                 kelompok: "Tas + Dompet",
                 items: [
                     {jenis: "Tas CEKA", harga: 161684, lokasi: "https://id.shp.ee/vTqKXi3"},
@@ -177,13 +188,16 @@
             return savedStatus ? JSON.parse(savedStatus) : {};
         }
 
+
         function saveChecklistStatus(status) {
             localStorage.setItem('seserahanChecklist', JSON.stringify(status));
         }
 
+
         function formatRupiah(angka) {
             return 'Rp ' + angka.toLocaleString('id-ID');
         }
+
 
         function hitungTotalHarga() {
             let total = 0;
@@ -199,6 +213,7 @@
             saldo = saldoAwal - total; // Mengurangi saldo sesuai total harga yang dipilih
             document.getElementById('saldo').textContent = formatRupiah(saldo);
         }
+
 
         const checklistStatus = loadChecklistStatus();
 
@@ -238,13 +253,18 @@
             hitungTotalHarga();
         }
 
+
         function toggleChecklist(itemId) {
             checklistStatus[itemId] = !checklistStatus[itemId];
             saveChecklistStatus(checklistStatus);
             renderSeserahan();
         }
 
+
         renderSeserahan();
+
     </script>
+
 </body>
+
 </html>
